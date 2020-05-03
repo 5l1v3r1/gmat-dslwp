@@ -1,0 +1,6 @@
+[submodule "gmat-dslwp-source"]
+	path = gmat-dslwp-source
+	url = git@github.com:daniestevez/gmat-dslwp-source.git
+[submodule "gmat-dslwp-binary"]
+	path = gmat-dslwp-binary
+	url = git@github.com:daniestevez/gmat-dslwp-binary.git
