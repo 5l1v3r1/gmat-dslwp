@@ -1,0 +1,169 @@
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft DSLWP_B;
+DSLWP_B.DateFormat = UTCGregorian;
+DSLWP_B.Epoch = '28 Jun 2019 03:00:00.000';
+DSLWP_B.CoordinateSystem = LunaICRF;
+DSLWP_B.DisplayStateType = Keplerian;
+DSLWP_B.SMA = 8704.163;
+DSLWP_B.ECC = 0.690187;
+DSLWP_B.INC = 44.672;
+DSLWP_B.RAAN = 71.711;
+DSLWP_B.AOP = 68.006;
+DSLWP_B.TA = 176.09042928330206;
+DSLWP_B.DryMass = 45;
+DSLWP_B.Cd = 2.2;
+DSLWP_B.Cr = 1.8;
+DSLWP_B.DragArea = 0.25;
+DSLWP_B.SRPArea = 0.25;
+DSLWP_B.Id = 11111;
+
+DSLWP_B.AddHardware = {UHFAntenna, UHFDownlink};
+
+%----------------------------------------
+%---------- Hardware Components
+%----------------------------------------
+
+% DSLWP-B hardware
+
+Create Antenna UHFAntenna;
+Create Transmitter UHFDownlink;
+UHFDownlink.PrimaryAntenna = UHFAntenna;
+UHFDownlink.Frequency = 435.4;
+
+Create Antenna Dish25m;
+Create Receiver PI9CAMReceiver;
+PI9CAMReceiver.PrimaryAntenna = Dish25m;
+PI9CAMReceiver.Id = '0';
+
+% Shahe hardware
+
+Create Antenna Dish12m;
+Create Receiver ShaheReceiver;
+ShaheReceiver.PrimaryAntenna = Dish12m;
+ShaheReceiver.Id = '1';
+
+%----------------------------------------
+%---------- GroundStations
+%----------------------------------------
+
+Create GroundStation PI9CAM;
+PI9CAM.CentralBody = Earth;
+PI9CAM.StateType = Spherical;
+PI9CAM.HorizonReference = Ellipsoid;
+PI9CAM.Location1 = 52.81201944;
+PI9CAM.Location2 = 6.39616944;
+PI9CAM.Location3 = 0.025;
+PI9CAM.Id = '22222';
+PI9CAM.AddHardware = {Dish25m, PI9CAMReceiver};
+PI9CAM.IonosphereModel = 'None'; % supplied data for IRI2007 model ends on 2018-03-22
+PI9CAM.TroposphereModel = 'HopfieldSaastamoinen';
+PI9CAM.ErrorModels = {PI9CAM_Shahe_DeltaRange};
+%PI9CAM.DataSource = 'Constant';
+%PI9CAM.Temperature = 295.1;
+%PI9CAM.Pressure = 1013.5;
+%PI9CAM.Humidity = 55;
+
+Create GroundStation Shahe;
+Shahe.CentralBody = Earth;
+Shahe.StateType = Spherical;
+Shahe.HorizonReference = Ellipsoid;
+Shahe.Location1 = 40.117519;
+Shahe.Location2 = 116.229944;
+Shahe.Location3 = 0.055;
+Shahe.Id = '33333';
+Shahe.AddHardware = {Dish12m, ShaheReceiver};
+Shahe.IonosphereModel = 'None'; % supplied data for IRI2007 model ends on 2018-03-22
+Shahe.TroposphereModel = 'HopfieldSaastamoinen';
+Shahe.ErrorModels = {PI9CAM_Shahe_DeltaRange};
+%Shahe.DataSource = 'Constant';
+%Shahe.Temperature = 295.1;
+%Shahe.Pressure = 1013.5;
+%Shahe.Humidity = 55;
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel LunaProp_ForceModel;
+LunaProp_ForceModel.CentralBody = Luna;
+LunaProp_ForceModel.PrimaryBodies = {Luna};
+LunaProp_ForceModel.PointMasses = {Earth, Jupiter, Mars, Neptune, Saturn, Sun, Uranus, Venus};
+LunaProp_ForceModel.Drag = None;
+LunaProp_ForceModel.SRP = On;
+LunaProp_ForceModel.RelativisticCorrection = On;
+LunaProp_ForceModel.ErrorControl = None;
+LunaProp_ForceModel.GravityField.Luna.Degree = 10;
+LunaProp_ForceModel.GravityField.Luna.Order = 10;
+LunaProp_ForceModel.GravityField.Luna.StmLimit = 100;
+
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator LunaProp;
+LunaProp.FM = LunaProp_ForceModel;
+LunaProp.Type = PrinceDormand78;
+LunaProp.InitialStepSize = 10;
+LunaProp.MinStep = 0;
+LunaProp.MaxStep = 60;
+
+
+%----------------------------------------
+%---------- Coordinate Systems
+%----------------------------------------
+
+Create CoordinateSystem LunaICRF;
+LunaICRF.Origin = Luna;
+LunaICRF.Axes = ICRF;
+
+%----------------------------------------
+%---------- ErrorModels
+%----------------------------------------
+
+Create ErrorModel PI9CAM_Shahe_DeltaRange;
+PI9CAM_Shahe_DeltaRange.Type = 'DeltaRange';
+PI9CAM_Shahe_DeltaRange.NoiseSigma = 1.1;
+PI9CAM_Shahe_DeltaRange.Bias = -3;
+
+%----------------------------------------
+%---------- MeasurementModels
+%----------------------------------------
+
+%Create GeometricRangeRate rate
+
+Create TrackingFileSet DSNsimData;
+DSNsimData.AddTrackingConfig = {{PI9CAM, DSLWP_B, Shahe}, 'DeltaRange'};
+DSNsimData.FileName = {'DSLWP-B.gmd'};
+
+DSNsimData.UseLightTime = true;
+DSNsimData.UseRelativityCorrection = true;
+DSNsimData.UseETminusTAI = true;
+DSNsimData.AberrationCorrection = 'None';
+
+%----------------------------------------
+%---------- Solvers
+%----------------------------------------
+
+Create Simulator Sim;
+Sim.AddData = {DSNsimData};
+Sim.Propagator = LunaProp;
+Sim.EpochFormat = UTCGregorian;
+Sim.InitialEpoch = '28 Jun 2019 05:00:00.000';
+Sim.FinalEpoch = '28 Jun 2019 05:00:00.000';
+Sim.MeasurementTimeStep = 60;
+Sim.AddNoise = On;
+
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+
+BeginMissionSequence;
+
+RunSimulator Sim;
+
