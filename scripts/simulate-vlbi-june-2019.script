@@ -1,0 +1,277 @@
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft DSLWP_B;
+DSLWP_B.DateFormat = UTCModJulian;
+DSLWP_B.Epoch = '28637.5';
+DSLWP_B.CoordinateSystem = LunaICRF;
+DSLWP_B.DisplayStateType = Cartesian;
+DSLWP_B.X = 7153.0634983255
+DSLWP_B.Y = -977.79051083117
+DSLWP_B.Z = -7518.0459215719
+DSLWP_B.VX = -0.2055711290953
+DSLWP_B.VY = 0.5133087032117
+DSLWP_B.VZ = 0.2686463541015
+DSLWP_B.DryMass = 45;
+DSLWP_B.Cd = 2.2;
+DSLWP_B.Cr = 1.8;
+DSLWP_B.DragArea = 0.25;
+DSLWP_B.SRPArea = 0.25;
+DSLWP_B.Id = '11111';
+DSLWP_B.AddHardware = {UHFAntenna, UHFDownlink};
+DSLWP_B.SolveFors = {'CartesianState'};
+
+%----------------------------------------
+%---------- Hardware Components
+%----------------------------------------
+
+% DSLWP-B hardware
+
+Create Antenna UHFAntenna;
+
+Create Transmitter UHFDownlink;
+UHFDownlink.PrimaryAntenna = UHFAntenna;
+UHFDownlink.Frequency = 435.4;
+
+Create Antenna Dish25m;
+
+Create Receiver PI9CAMReceiver;
+PI9CAMReceiver.PrimaryAntenna = Dish25m;
+PI9CAMReceiver.Id = '0';
+
+% Shahe hardware
+
+Create Antenna Dish12m;
+
+Create Receiver ShaheReceiver;
+ShaheReceiver.PrimaryAntenna = Dish12m;
+ShaheReceiver.Id = '1';
+
+% Harbin hardware
+
+Create Antenna HarbinYagis;
+
+Create Receiver HarbinReceiver;
+HarbinReceiver.PrimaryAntenna = HarbinYagis;
+HarbinReceiver.Id = '2';
+
+% Wakayama hardware
+
+Create Antenna DishWakayama;
+
+Create Receiver WakayamaReceiver;
+WakayamaReceiver.PrimaryAntenna = DishWakayama;
+WakayamaReceiver.Id = '3';
+
+%----------------------------------------
+%---------- GroundStations
+%----------------------------------------
+
+Create GroundStation PI9CAM;
+PI9CAM.CentralBody = Earth;
+PI9CAM.StateType = Spherical;
+PI9CAM.HorizonReference = Ellipsoid;
+PI9CAM.Location1 = 52.81201944;
+PI9CAM.Location2 = 6.39616944;
+PI9CAM.Location3 = 0.025;
+PI9CAM.Id = '22222';
+PI9CAM.AddHardware = {Dish25m, PI9CAMReceiver};
+PI9CAM.IonosphereModel = 'IRI2007';
+PI9CAM.TroposphereModel = 'HopfieldSaastamoinen';
+PI9CAM.DataSource = 'Constant';
+PI9CAM.Temperature = 295.1;
+PI9CAM.Pressure = 1013.5;
+PI9CAM.Humidity = 55;
+PI9CAM.MinimumElevationAngle = 7;
+PI9CAM.ErrorModels = {DeltaRange, DeltaRangeRate};
+
+Create GroundStation Shahe;
+Shahe.CentralBody = Earth;
+Shahe.StateType = Spherical;
+Shahe.HorizonReference = Ellipsoid;
+Shahe.Location1 = 40.117519;
+Shahe.Location2 = 116.229944;
+Shahe.Location3 = 0.055;
+Shahe.Id = '33333';
+Shahe.AddHardware = {Dish12m, ShaheReceiver};
+Shahe.IonosphereModel = 'IRI2007';
+Shahe.TroposphereModel = 'HopfieldSaastamoinen';
+Shahe.DataSource = 'Constant';
+Shahe.Temperature = 295.1;
+Shahe.Pressure = 1013.5;
+Shahe.Humidity = 55;
+Shahe.MinimumElevationAngle = 7;
+Shahe.ErrorModels = {DeltaRange, DeltaRangeRate};
+
+Create GroundStation Harbin;
+Harbin.CentralBody = Earth;
+Harbin.StateType = Spherical;
+Harbin.HorizonReference = Ellipsoid;
+Harbin.Location1 = 45.9530917;
+Harbin.Location2 = 126.8002056;
+Harbin.Location3 = 0.117;
+Harbin.Id = '44444';
+Harbin.AddHardware = {HarbinYagis, HarbinReceiver};
+Harbin.IonosphereModel = 'IRI2007';
+Harbin.TroposphereModel = 'HopfieldSaastamoinen';
+Harbin.DataSource = 'Constant';
+Harbin.Temperature = 295.1;
+Harbin.Pressure = 1013.5;
+Harbin.Humidity = 55;
+Harbin.MinimumElevationAngle = 7;
+Harbin.ErrorModels = {DeltaRange, DeltaRangeRate};
+
+Create GroundStation Wakayama;
+Wakayama.CentralBody = Earth;
+Wakayama.StateType = Spherical;
+Wakayama.HorizonReference = Ellipsoid;
+Wakayama.Location1 = 34.266076;
+Wakayama.Location2 = 135.151467;
+Wakayama.Location3 = 0;
+Wakayama.Id = '55555';
+Wakayama.AddHardware = {DishWakayama, WakayamaReceiver};
+Wakayama.IonosphereModel = 'IRI2007';
+Wakayama.TroposphereModel = 'HopfieldSaastamoinen';
+Wakayama.DataSource = 'Constant';
+Wakayama.Temperature = 295.1;
+Wakayama.Pressure = 1013.5;
+Wakayama.Humidity = 55;
+Wakayama.MinimumElevationAngle = 7;
+Wakayama.ErrorModels = {DeltaRange, DeltaRangeRate};
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel LunaProp_ForceModel;
+LunaProp_ForceModel.CentralBody = Luna;
+LunaProp_ForceModel.PrimaryBodies = {Luna};
+LunaProp_ForceModel.PointMasses = {Earth, Jupiter, Mars, Neptune, Saturn, Sun, Uranus, Venus};
+LunaProp_ForceModel.Drag = None;
+LunaProp_ForceModel.SRP = On;
+LunaProp_ForceModel.RelativisticCorrection = On;
+LunaProp_ForceModel.ErrorControl = None;
+LunaProp_ForceModel.GravityField.Luna.Degree = 10;
+LunaProp_ForceModel.GravityField.Luna.Order = 10;
+LunaProp_ForceModel.GravityField.Luna.StmLimit = 100;
+
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator LunaProp;
+LunaProp.FM = LunaProp_ForceModel;
+LunaProp.Type = PrinceDormand78;
+LunaProp.InitialStepSize = 10;
+LunaProp.Accuracy = 9.999999999999999e-12;
+LunaProp.MinStep = 0;
+LunaProp.MaxStep = 60;
+LunaProp.MaxStepAttempts = 50;
+LunaProp.StopIfAccuracyIsViolated = true;
+
+%----------------------------------------
+%---------- Coordinate Systems
+%----------------------------------------
+
+Create CoordinateSystem LunaICRF;
+GMAT LunaICRF.Origin = Luna;
+GMAT LunaICRF.Axes = ICRF;
+
+%----------------------------------------
+%---------- ErrorModels
+%----------------------------------------
+
+Create ErrorModel DeltaRange;
+DeltaRange.Type = 'DeltaRange';
+DeltaRange.NoiseSigma = 1.2;
+DeltaRange.Bias = 0;
+
+Create ErrorModel DeltaRangeRate;
+DeltaRangeRate.Type = 'DeltaRangeRate';
+DeltaRangeRate.NoiseSigma = 0.0002;
+DeltaRangeRate.Bias = 0;
+
+%----------------------------------------
+%---------- MeasurementModels
+%----------------------------------------
+
+Create TrackingFileSet VLBIsimData;
+VLBIsimData.AddTrackingConfig = {{PI9CAM, DSLWP_B, Shahe}, 'DeltaRange'};
+VLBIsimData.AddTrackingConfig = {{PI9CAM, DSLWP_B, Harbin}, 'DeltaRange'};
+VLBIsimData.AddTrackingConfig = {{PI9CAM, DSLWP_B, Wakayama}, 'DeltaRange'};
+VLBIsimData.AddTrackingConfig = {{Shahe, DSLWP_B, Harbin}, 'DeltaRange'};
+VLBIsimData.AddTrackingConfig = {{Shahe, DSLWP_B, Wakayama}, 'DeltaRange'};
+VLBIsimData.AddTrackingConfig = {{Harbin, DSLWP_B, Wakayama}, 'DeltaRange'};
+VLBIsimData.AddTrackingConfig = {{PI9CAM, DSLWP_B, Shahe}, 'DeltaRangeRate'};
+VLBIsimData.AddTrackingConfig = {{PI9CAM, DSLWP_B, Harbin}, 'DeltaRangeRate'};
+VLBIsimData.AddTrackingConfig = {{PI9CAM, DSLWP_B, Wakayama}, 'DeltaRangeRate'};
+VLBIsimData.AddTrackingConfig = {{Shahe, DSLWP_B, Harbin}, 'DeltaRangeRate'};
+VLBIsimData.AddTrackingConfig = {{Shahe, DSLWP_B, Wakayama}, 'DeltaRangeRate'};
+VLBIsimData.AddTrackingConfig = {{Harbin, DSLWP_B, Wakayama}, 'DeltaRangeRate'};
+VLBIsimData.FileName = {'DSLWP-B_june_2019.gmd'};
+
+VLBIsimData.UseLightTime = true;
+VLBIsimData.UseRelativityCorrection = true;
+VLBIsimData.UseETminusTAI = true;
+VLBIsimData.SimDopplerCountInterval = 1;
+
+%----------------------------------------
+%---------- Solvers
+%----------------------------------------
+
+Create Simulator Sim;
+GMAT Sim.AddData = {VLBIsimData};
+GMAT Sim.Propagator = LunaProp;
+GMAT Sim.EpochFormat = UTCGregorian;
+GMAT Sim.InitialEpoch = '03 Jun 2019 00:00:00.000';
+GMAT Sim.FinalEpoch = '08 Jun 2019 00:00:00.000';
+GMAT Sim.MeasurementTimeStep = 60;
+GMAT Sim.AddNoise = On;
+
+Create AcceptFilter june04;
+june04.EpochFormat  = UTCGregorian;
+june04.InitialEpoch = '04 Jun 2019 07:00:00.000';
+june04.FinalEpoch   = '04 Jun 2019 09:00:00.000';
+
+Create AcceptFilter june05;
+june05.EpochFormat  = UTCGregorian;
+june05.InitialEpoch = '05 Jun 2019 07:00:00.000';
+june05.FinalEpoch   = '05 Jun 2019 09:00:00.000';
+
+Create AcceptFilter june06;
+june06.EpochFormat  = UTCGregorian;
+june06.InitialEpoch = '06 Jun 2019 07:00:00.000';
+june06.FinalEpoch   = '06 Jun 2019 09:00:00.000';
+
+Create AcceptFilter june07;
+june07.EpochFormat  = UTCGregorian;
+june07.InitialEpoch = '07 Jun 2019 08:00:00.000';
+june07.FinalEpoch   = '07 Jun 2019 10:00:00.000';
+
+Create BatchEstimator bat;
+bat.DataFilters = {june04, june05, june06, june07}
+bat.ShowProgress = true;
+bat.ReportStyle = Normal;
+bat.ReportFile = 'DSLWP-B_VLBI_june_2019_estimation.report';
+bat.MaximumIterations = 10;
+bat.Measurements = {VLBIsimData};
+bat.Propagator = LunaProp;
+bat.ShowAllResiduals = On;
+bat.AbsoluteTol = 0.001;
+bat.RelativeTol = 0.0001;
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+BeginMissionSequence;
+
+%RunSimulator Sim;
+RunEstimator bat;
